@@ -1,0 +1,142 @@
+package com.hoan.turnercodingtest.activities.main;
+
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.hoan.turnercodingtest.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Created by Hoan on 10/10/2016.
+ */
+
+public class WeatherModel implements Parcelable {
+    public static final int NO_RESOURCE = -1;
+    public long dt;
+    public int maxTemperature;
+    public int minTemperature;
+    public int humidity;
+    public int pressure;
+    public float windSpeed;
+    public float degree;
+    public String main;
+    public String icon;
+    public String dayOfTheWeek;
+    public String date;
+
+    public String getDate(Context context, int dayFromNow) {
+        Date date = new Date();
+        long time = date.getTime();
+        time += dayFromNow * 24 * 60 * 60 * 1000;
+        return new SimpleDateFormat("MMM d").format(new Date(time));
+    }
+
+    public String getDayOfTheWeek(Context context, int dayFromNow) {
+        if (dayFromNow == 0) return context.getString(R.string.today);
+        if (dayFromNow == 1) return context.getString(R.string.tomorrow);
+
+        Date date = new Date();
+        long time = date.getTime();
+        time += dayFromNow * 24 * 60 * 60 * 1000;
+        return new SimpleDateFormat("EEE").format(new Date(time));
+    }
+
+    // Could create a hashmap instead but doing this saves some memory.
+    // Could use switch statement if JDK is 7 or later
+    public int getIconResId() {
+        if ("01".equals(icon)) return R.drawable.ic_clear;
+
+        if ("02".equals(icon)) return R.drawable.ic_light_clouds;
+
+        if ("03".equals(icon) || "04".equals(icon)) return R.drawable.ic_cloudy;
+
+        if ("09".equals(icon)) return R.drawable.ic_light_rain;
+
+        if ("10".equals(icon)) return R.drawable.ic_rain;
+
+        if ("11".equals(icon)) return R.drawable.ic_storm;
+
+        if ("13".equals(icon)) return R.drawable.ic_snow;
+
+        if ("50".equals(icon)) return R.drawable.ic_fog;
+
+        return NO_RESOURCE;
+    }
+
+    // Could create a hashmap instead but doing this save some memory.
+    // Could use switch statement if JDK is 7 or later
+    public int getArtResId() {
+        if ("01".equals(icon)) return R.drawable.art_clear;
+
+        if ("02".equals(icon)) return R.drawable.art_light_clouds;
+
+        if ("03".equals(icon) || "04".equals(icon)) return R.drawable.art_clouds;
+
+        if ("09".equals(icon)) return R.drawable.art_light_rain;
+
+        if ("10".equals(icon)) return R.drawable.art_rain;
+
+        if ("11".equals(icon)) return R.drawable.art_storm;
+
+        if ("13".equals(icon)) return R.drawable.art_snow;
+
+        if ("50".equals(icon)) return R.drawable.art_fog;
+
+        return NO_RESOURCE;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.dt);
+        dest.writeInt(this.maxTemperature);
+        dest.writeInt(this.minTemperature);
+        dest.writeInt(this.humidity);
+        dest.writeInt(this.pressure);
+        dest.writeFloat(this.windSpeed);
+        dest.writeFloat(this.degree);
+        dest.writeString(this.main);
+        dest.writeString(this.icon);
+    }
+
+    public WeatherModel() {
+    }
+
+    protected WeatherModel(Parcel in) {
+        this.dt = in.readLong();
+        this.maxTemperature = in.readInt();
+        this.minTemperature = in.readInt();
+        this.humidity = in.readInt();
+        this.pressure = in.readInt();
+        this.windSpeed = in.readFloat();
+        this.degree = in.readFloat();
+        this.main = in.readString();
+        this.icon = in.readString();
+    }
+
+    public static final Creator<WeatherModel> CREATOR = new Creator<WeatherModel>() {
+        @Override
+        public WeatherModel createFromParcel(Parcel source) {
+            return new WeatherModel(source);
+        }
+
+        @Override
+        public WeatherModel[] newArray(int size) {
+            return new WeatherModel[size];
+        }
+    };
+
+    @Override
+    public String toString() {
+        return "dt = " + dt + "\nmaxTemperature = " + maxTemperature + "\nminTemperature = " + minTemperature
+                + "\nicon = " + icon + "\nhumidity = " + humidity + "\nPressure = " + pressure + "\nwindSpeed = "
+                + windSpeed + "\ndegree = " + degree;
+    }
+}
