@@ -113,7 +113,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
                 @Override
                 public void onCompleted(String response) {
                     if (!isCancelled()) {
-                        mWeatherModel = JsonParser.parseWeather(MainActivity.this, response);
+                        mWeatherModel = JsonParser.parseWeather(response);
                         if (mWeatherModel == null) {
                             onError(null);
                         } else {
@@ -156,12 +156,12 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
         @Override
         protected Void doInBackground(Void... params) {
             String url = BASE_URL + mLocation + "&mode=" + mMode
-                    + "&units=" + mUnit + "&cnt=5&appid=" + Configuration.getWeatherKey();
+                    + "&units=" + mUnit + "&cnt=7&appid=" + Configuration.getWeatherKey();
             NetworkHelper.queryServer(url, new NetworkHelper.ServerResponseListener() {
                 @Override
                 public void onCompleted(String response) {
                     if (!isCancelled()) {
-                        onDownloadCompleted(JsonParser.parseForecast(MainActivity.this, response));
+                        onDownloadCompleted(JsonParser.parseForecast(response));
                     }
                 }
 

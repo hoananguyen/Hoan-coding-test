@@ -1,7 +1,5 @@
 package com.hoan.turnercodingtest.utils;
 
-import android.content.Context;
-
 import com.hoan.turnercodingtest.activities.main.WeatherModel;
 
 import org.json.JSONArray;
@@ -15,12 +13,12 @@ import java.util.ArrayList;
 
 public class JsonParser {
 
-    public static WeatherModel parseWeather(Context context, String jsonObjectString) {
+    public static WeatherModel parseWeather(String jsonObjectString) {
         JSONObject jsonObject = JsonHelper.createJSONObject(jsonObjectString);
-        return jsonObject == null ? null : parseWeather(context, jsonObject);
+        return jsonObject == null ? null : parseWeather(jsonObject);
     }
 
-    public static WeatherModel parseWeather(Context context, JSONObject jsonObject) {
+    public static WeatherModel parseWeather(JSONObject jsonObject) {
         WeatherModel weatherModel = new WeatherModel();
         weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
         JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
@@ -37,12 +35,10 @@ public class JsonParser {
         JSONObject windObject = JsonHelper.getJSONObject(jsonObject, "wind");
         weatherModel.windSpeed = (float) JsonHelper.getDouble(windObject, "speed");
         weatherModel.degree = (float) JsonHelper.getDouble(windObject, "deg");
-        weatherModel.dayOfTheWeek = weatherModel.getDayOfTheWeek(context, 0);
-        weatherModel.date = weatherModel.getDate(context, 0);
         return weatherModel;
     }
 
-    public static ArrayList<WeatherModel> parseForecast(Context context, String jsonObjectString) {
+    public static ArrayList<WeatherModel> parseForecast(String jsonObjectString) {
         ArrayList<WeatherModel> weatherModels = new ArrayList<>();
         JSONArray weatherJsonArray = JsonHelper.getJSONArray(JsonHelper.createJSONObject(jsonObjectString), "list");
         int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
@@ -51,6 +47,9 @@ public class JsonParser {
             WeatherModel weatherModel = new WeatherModel();
             JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
+            if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") < 1) {
+                continue;
+            }
             weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(jsonObject, "pressure"));
             weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(jsonObject, "humidity"));
             weatherModel.windSpeed = (float) JsonHelper.getDouble(jsonObject, "speed");
@@ -65,8 +64,6 @@ public class JsonParser {
                 weatherModel.icon = weatherModel.icon.substring(0, weatherModel.icon.length() - 1);
             }
             weatherModels.add(weatherModel);
-            weatherModel.dayOfTheWeek = weatherModel.getDayOfTheWeek(context, i + 1);
-            weatherModel.date = weatherModel.getDate(context, i + 1);
         }
         return weatherModels;
     }

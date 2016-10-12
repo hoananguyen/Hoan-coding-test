@@ -13,6 +13,7 @@ public final class Logger {
     private Logger() {}
 
     private static final List<String> CLASS_SIMPLE_NAMES = Arrays.asList(
+            "DateHelper",
             "ForecastTask",
             "JsonParser",
             "MainActivity",

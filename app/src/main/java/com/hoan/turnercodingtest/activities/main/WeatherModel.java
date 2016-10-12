@@ -5,9 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.hoan.turnercodingtest.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.hoan.turnercodingtest.utils.DateHelper;
 
 /**
  * Created by Hoan on 10/10/2016.
@@ -24,24 +22,20 @@ public class WeatherModel implements Parcelable {
     public float degree;
     public String main;
     public String icon;
-    public String dayOfTheWeek;
-    public String date;
 
-    public String getDate(Context context, int dayFromNow) {
-        Date date = new Date();
-        long time = date.getTime();
-        time += dayFromNow * 24 * 60 * 60 * 1000;
-        return new SimpleDateFormat("MMM d").format(new Date(time));
+    public String getDate() {
+        return DateHelper.getDate(dt, "GMT-4", "MMM d");
     }
 
-    public String getDayOfTheWeek(Context context, int dayFromNow) {
-        if (dayFromNow == 0) return context.getString(R.string.today);
-        if (dayFromNow == 1) return context.getString(R.string.tomorrow);
+    public String getDayOfTheWeek() {
+        return DateHelper.getDate(dt, "GMT-4", "EEE");
+    }
 
-        Date date = new Date();
-        long time = date.getTime();
-        time += dayFromNow * 24 * 60 * 60 * 1000;
-        return new SimpleDateFormat("EEE").format(new Date(time));
+    public String getDayOfTheWeek(Context context) {
+        if (DateHelper.isTomorrow(dt, "GMT-4")) {
+            return context.getString(R.string.tomorrow);
+        }
+        return getDayOfTheWeek();
     }
 
     // Could create a hashmap instead but doing this saves some memory.

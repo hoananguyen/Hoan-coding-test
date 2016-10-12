@@ -48,8 +48,8 @@ public class WeatherDetailFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             WeatherModel weatherModel = args.getParcelable("weather");
-            dateTextView.setText(weatherModel.date);
-            dayOfTheWeekTextView.setText(weatherModel.dayOfTheWeek);
+            dateTextView.setText(weatherModel.getDate());
+            dayOfTheWeekTextView.setText(weatherModel.getDayOfTheWeek());
             maxTemperatureTextView.setText(weatherModel.maxTemperature + "\u00B0");
             minTemperatureTextView.setText(weatherModel.minTemperature + "\u00B0");
             mainTextView.setText(weatherModel.main);

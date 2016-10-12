@@ -66,7 +66,7 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
         TextView mainTextView = (TextView) headerView.findViewById(R.id.text_view_header_main);
         ImageView iconImageView = (ImageView) headerView.findViewById(R.id.image_view_header_icon);
 
-        dateTextView.setText(weatherModel.dayOfTheWeek + ", " + weatherModel.getDate(getActivity(), 0));
+        dateTextView.setText(getString(R.string.today) + ", " + weatherModel.getDate());
         maxTempTextView.setText(weatherModel.maxTemperature + "\u00B0");
         minTempTextView.setText(weatherModel.minTemperature + "\u00B0");
         mainTextView.setText(weatherModel.main);
@@ -127,7 +127,7 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
             ImageView iconImageView = ViewHolder.get(row, R.id.image_view_icon);
 
             WeatherModel weatherModel = getItem(position);
-            dayOfTheWeekTextView.setText(weatherModel.dayOfTheWeek);
+            dayOfTheWeekTextView.setText(weatherModel.getDayOfTheWeek(getActivity()));
             minTempTextView.setText(weatherModel.minTemperature + "\u00B0");
             maxTempTextView.setText(weatherModel.maxTemperature + "\u00B0");
             mainTextView.setText(weatherModel.main);
