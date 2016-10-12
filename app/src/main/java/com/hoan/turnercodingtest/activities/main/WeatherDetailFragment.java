@@ -55,7 +55,7 @@ public class WeatherDetailFragment extends Fragment {
             mainTextView.setText(weatherModel.main);
             humidityTextView.append(String.valueOf(weatherModel.humidity) + "%");
             pressureTextView.append(String.valueOf(weatherModel.pressure) + " hPa");
-            windTextView.append(String.valueOf(weatherModel.windSpeed) + " km/h " + weatherModel.getWindDir());
+            windTextView.append(String.valueOf(weatherModel.windSpeed) + " mph " + weatherModel.getWindDir());
             iconImageView.setImageResource(weatherModel.getArtResId());
         }
 
