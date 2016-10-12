@@ -12,6 +12,8 @@
         android:id="@+id/image_view_icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:layout_gravity="center"
         android:layout_weight="2"/>
 
     <LinearLayout
@@ -23,12 +25,14 @@
         <TextView
             android:id="@+id/text_view_day_of_the_week"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <TextView
             android:id="@+id/text_view_main"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     </LinearLayout>
 
@@ -41,12 +45,14 @@
         <TextView
             android:id="@+id/text_view_max_temp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <TextView
             android:id="@+id/text_view_min_temp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     </LinearLayout>
 

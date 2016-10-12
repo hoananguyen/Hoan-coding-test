@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import com.hoan.turnercodingtest.R;
 
-import java.util.ArrayList;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,8 +54,8 @@ public class WeatherDetailFragment extends Fragment {
             minTemperatureTextView.setText(weatherModel.minTemperature + "\u00B0");
             mainTextView.setText(weatherModel.main);
             humidityTextView.append(String.valueOf(weatherModel.humidity) + "%");
-            pressureTextView.setText(String.valueOf(weatherModel.pressure) + "hPa");
-            windTextView.setText(String.valueOf(weatherModel.windSpeed) + "km/h ");
+            pressureTextView.append(String.valueOf(weatherModel.pressure) + " hPa");
+            windTextView.append(String.valueOf(weatherModel.windSpeed) + " km/h ");
             iconImageView.setImageResource(weatherModel.getArtResId());
         }
 
