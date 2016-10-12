@@ -61,14 +61,6 @@ public class NetworkHelper {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			in = new BufferedReader(new InputStreamReader(serverConnection.getErrorStream()), BUFFER_SIZE);
-			try {
-				while ((line = in.readLine()) != null) {
-					output = output + line + "\n";
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 			serverResponseListener.onError(output);
 		} finally {
 			// Release resources

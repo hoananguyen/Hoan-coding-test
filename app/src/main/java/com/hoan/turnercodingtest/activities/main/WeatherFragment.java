@@ -1,7 +1,6 @@
 package com.hoan.turnercodingtest.activities.main;
 
 
-import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -17,17 +16,16 @@ import com.hoan.turnercodingtest.R;
 import com.hoan.turnercodingtest.utils.Logger;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  */
 public class WeatherFragment extends ListFragment implements View.OnClickListener {
+
     public interface WeatherFragmentEventListener {
         void onItemClicked(WeatherModel weatherModel);
     }
 
-    List<WeatherModel> mWeatherModels;
     private WeatherFragmentEventListener mListener;
 
     public WeatherFragment() {
@@ -55,7 +53,6 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
         if (args != null) {
             WeatherModel weatherModel = args.getParcelable("weather");
             setTodayView(headerView, weatherModel);
-            mWeatherModels = args.getParcelableArrayList("forecast");
             setListAdapter(new WeatherAdapter());
         }
         return v;
@@ -79,13 +76,12 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         Logger.e("WeatherFragment", "onClick mListener is null " + (mListener == null));
-        WeatherModel weatherModel = getArguments().getParcelable("weather");
-        mListener.onItemClicked(weatherModel);
+        mListener.onItemClicked((WeatherModel) getArguments().getParcelable("weather"));
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        mListener.onItemClicked(mWeatherModels.get(position));
+        mListener.onItemClicked((WeatherModel) getArguments().getParcelableArrayList("forecast").get(position));
     }
 
     @Override
@@ -93,7 +89,6 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
         super.onAttach(context);
 
         Logger.e("WeatherFragment", "onAttach");
-        if (context instanceof Activity)
         mListener = (WeatherFragmentEventListener) context;
     }
 
@@ -105,12 +100,12 @@ public class WeatherFragment extends ListFragment implements View.OnClickListene
         @Override
         public int getCount() {
             Logger.e("WeatherAdapter", "getCount");
-            return mWeatherModels == null ? 0 :mWeatherModels.size();
+            return getArguments().getParcelableArrayList("forecast").size();
         }
 
         @Override
         public WeatherModel getItem(int position) {
-            return mWeatherModels.get(position);
+            return (WeatherModel) getArguments().getParcelableArrayList("forecast").get(position);
         }
 
         @Override
