@@ -6,12 +6,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.hoan.turnercodingtest.Configuration;
 import com.hoan.turnercodingtest.R;
+import com.hoan.turnercodingtest.SingletonFactory;
 import com.hoan.turnercodingtest.activities.BaseActivityWithFragment;
-import com.hoan.turnercodingtest.utils.JsonParser;
+import com.hoan.turnercodingtest.services.DataService;
+import com.hoan.turnercodingtest.services.FutureTaskListener;
 import com.hoan.turnercodingtest.utils.Logger;
-import com.hoan.turnercodingtest.utils.NetworkHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +53,10 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
         super.onStart();
 
         mProgressBar.setVisibility(View.VISIBLE);
-        mWeatherTask = new WeatherTask("Atlanta,ga", "json", "imperial");
-        mForecastTask = new ForecastTask("Atlanta,ga", "json", "imperial");
+        //mWeatherTask = new WeatherTask("Atlanta,ga", "json", "imperial");
+        //mForecastTask = new ForecastTask("Atlanta,ga", "json", "imperial");
+        mWeatherTask = new WeatherTask("Atlanta,ga");
+        mForecastTask = new ForecastTask("Atlanta,ga");
         mWeatherTask.execute();
         mForecastTask.execute();
     }
@@ -76,6 +78,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
     @Override
     public void onBackPressed() {
         if (getFragmentManager().findFragmentByTag("WeatherDetailFragment") == null) {
+            SingletonFactory.INSTANCE.checkMemoryLeak();
             super.onBackPressed();
         } else {
             getFragmentManager().popBackStack();
@@ -90,18 +93,22 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
     }
 
     private class WeatherTask extends AsyncTask<Void, Void, Void> {
-        private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
+        //private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
         private final String mLocation;
-        private final String mUnit;
-        private final String mMode;
+        /*private final String mUnit;
+        private final String mMode;*/
 
-        public WeatherTask(String location, String mode, String unit) {
+        /*public WeatherTask(String location, String mode, String unit) {
             mLocation = location;
             mUnit = unit;
             mMode = mode;
+        }*/
+
+        public WeatherTask(String location) {
+            mLocation = location;
         }
 
-        @Override
+        /*@Override
         protected Void doInBackground(Void... params) {
             synchronized (mLockObject) {
                 mWeatherDownloadState = WEATHER_DOWNLOAD_STARTED;
@@ -137,23 +144,66 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
             });
 
             return null;
+        }*/
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            synchronized (mLockObject) {
+                mWeatherDownloadState = WEATHER_DOWNLOAD_STARTED;
+            }
+
+            DataService dataService = (DataService) SingletonFactory.INSTANCE.getSingleton(DataService.class.getName(), this);
+            dataService.getWeather(mLocation, new FutureTaskListener<WeatherModel>() {
+                @Override
+                public void onCompletion(WeatherModel result) {
+                    if (!isCancelled()) {
+                        synchronized (mLockObject) {
+                            mWeatherDownloadState = WEATHER_DOWNLOAD_COMPLETED;
+                            mLockObject.notifyAll();
+                        }
+                    }
+                    SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    if (!isCancelled()) {
+                        synchronized (mLockObject) {
+                            mWeatherDownloadState = WEATHER_DOWNLOAD_ERROR;
+                            mLockObject.notifyAll();
+                        }
+                    }
+                    SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+                }
+
+                @Override
+                public void onProgress(float progress) {
+
+                }
+            });
+
+            return null;
         }
     }
 
     private class ForecastTask extends AsyncTask<Void, Void, Void> {
-        private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=";
+        //private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=";
         private final String mLocation;
-        private final String mUnit;
-        private final String mMode;
+        /*private final String mUnit;
+        private final String mMode;*/
         private List<WeatherModel> mWeatherModelList;
 
-        public ForecastTask(String location, String mode, String unit) {
+        /*public ForecastTask(String location, String mode, String unit) {
             mLocation = location;
             mUnit = unit;
             mMode = mode;
+        }*/
+
+        public ForecastTask(String location) {
+            mLocation = location;
         }
 
-        @Override
+        /*@Override
         protected Void doInBackground(Void... params) {
             String url = BASE_URL + mLocation + "&mode=" + mMode
                     + "&units=" + mUnit + "&cnt=7&appid=" + Configuration.getWeatherKey();
@@ -174,10 +224,38 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
             });
 
             return null;
+        }*/
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DataService dataService = (DataService) SingletonFactory.INSTANCE.getSingleton(DataService.class.getName(), this);
+            dataService.getForecast(mLocation, new FutureTaskListener<ArrayList<WeatherModel>>() {
+                @Override
+                public void onCompletion(ArrayList<WeatherModel> result) {
+                    if (!isCancelled()) {
+                        onDownloadCompleted(result);
+                    }
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    if (!isCancelled()) {
+                        onDownloadCompleted(null);
+                    }
+                }
+
+                @Override
+                public void onProgress(float progress) {
+
+                }
+            });
+
+            return null;
         }
 
         private void onDownloadCompleted(final ArrayList<WeatherModel> weatherModels) {
 
+            SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
             while (mWeatherDownloadState == WEATHER_DOWNLOAD_STARTED) {
                 synchronized (mLockObject) {
                     try {
