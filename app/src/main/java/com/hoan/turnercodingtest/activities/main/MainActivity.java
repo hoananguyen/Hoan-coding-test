@@ -41,6 +41,8 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Logger.e("MainActivity", "onCreate");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,6 +54,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
     protected void onStart() {
         super.onStart();
 
+        Logger.e("MainActivity", "onStart");
         mProgressBar.setVisibility(View.VISIBLE);
         //mWeatherTask = new WeatherTask("Atlanta,ga", "json", "imperial");
         //mForecastTask = new ForecastTask("Atlanta,ga", "json", "imperial");
@@ -65,6 +68,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
     protected void onStop() {
         super.onStop();
 
+        Logger.e("MainActivity", "onStop");
         mProgressBar.setVisibility(View.GONE);
         if (mForecastTask != null && mForecastTask.getStatus() != AsyncTask.Status.FINISHED) {
             mForecastTask.cancel(true);
@@ -77,6 +81,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
 
     @Override
     public void onBackPressed() {
+        Logger.e("MainActivity", "onBackPressed");
         if (getFragmentManager().findFragmentByTag("WeatherDetailFragment") == null) {
             SingletonFactory.INSTANCE.checkMemoryLeak();
             super.onBackPressed();
@@ -148,6 +153,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
 
         @Override
         protected Void doInBackground(Void... params) {
+            Logger.e("WeatherTask", "doInBackground");
             synchronized (mLockObject) {
                 mWeatherDownloadState = WEATHER_DOWNLOAD_STARTED;
             }
@@ -156,24 +162,27 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
             dataService.getWeather(mLocation, new FutureTaskListener<WeatherModel>() {
                 @Override
                 public void onCompletion(WeatherModel result) {
+                    Logger.e("WeatherTask", "onCompletion");
                     if (!isCancelled()) {
+                        mWeatherModel = result;
                         synchronized (mLockObject) {
                             mWeatherDownloadState = WEATHER_DOWNLOAD_COMPLETED;
                             mLockObject.notifyAll();
                         }
                     }
-                    SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+                    releaseSingleton();
                 }
 
                 @Override
                 public void onError(String errorMessage) {
+                    Logger.e("WeatherTask", "onError");
                     if (!isCancelled()) {
                         synchronized (mLockObject) {
                             mWeatherDownloadState = WEATHER_DOWNLOAD_ERROR;
                             mLockObject.notifyAll();
                         }
                     }
-                    SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+                    releaseSingleton();
                 }
 
                 @Override
@@ -186,12 +195,16 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
         }
     }
 
+    private void releaseSingleton() {
+        SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+    }
+
     private class ForecastTask extends AsyncTask<Void, Void, Void> {
         //private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=";
         private final String mLocation;
         /*private final String mUnit;
         private final String mMode;*/
-        private List<WeatherModel> mWeatherModelList;
+        //private List<WeatherModel> mWeatherModelList;
 
         /*public ForecastTask(String location, String mode, String unit) {
             mLocation = location;
@@ -228,10 +241,12 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
 
         @Override
         protected Void doInBackground(Void... params) {
+            Logger.e("ForecastTask", "doInBackground");
             DataService dataService = (DataService) SingletonFactory.INSTANCE.getSingleton(DataService.class.getName(), this);
             dataService.getForecast(mLocation, new FutureTaskListener<ArrayList<WeatherModel>>() {
                 @Override
                 public void onCompletion(ArrayList<WeatherModel> result) {
+                    Logger.e("ForecastTask", "onCompletion");
                     if (!isCancelled()) {
                         onDownloadCompleted(result);
                     }
@@ -239,6 +254,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
 
                 @Override
                 public void onError(String errorMessage) {
+                    Logger.e("ForecastTask", "onError");
                     if (!isCancelled()) {
                         onDownloadCompleted(null);
                     }
@@ -254,16 +270,17 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
         }
 
         private void onDownloadCompleted(final ArrayList<WeatherModel> weatherModels) {
-
+            Logger.e("ForecastTask", "onDownloadCompleted");
             SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
             while (mWeatherDownloadState == WEATHER_DOWNLOAD_STARTED) {
                 synchronized (mLockObject) {
                     try {
-                        mLockObject.wait();
+                        mLockObject.wait(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         return;
                     }
+                    Logger.e("ForecastTask", "onDownloadCompleted after wait");
                 }
             }
             runOnUiThread(new Runnable() {

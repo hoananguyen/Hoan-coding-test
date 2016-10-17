@@ -39,6 +39,7 @@ public class VolleyNetworkService implements NetworkService, Singleton {
                 return true;
             }
         });
+        SingletonFactory.INSTANCE.releaseSingleton(NetworkService.class.getName(), this);
     }
 
     @Override

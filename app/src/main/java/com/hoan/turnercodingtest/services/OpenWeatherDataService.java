@@ -4,6 +4,7 @@ import com.hoan.turnercodingtest.Configuration;
 import com.hoan.turnercodingtest.SingletonFactory;
 import com.hoan.turnercodingtest.activities.main.WeatherModel;
 import com.hoan.turnercodingtest.utils.JsonParser;
+import com.hoan.turnercodingtest.utils.Logger;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,7 @@ public class OpenWeatherDataService implements DataService, Singleton {
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
+                Logger.e("OpenWeatherDataSercive", "result = " + result);
                 listener.onCompletion(JsonParser.parseWeather(result));
             }
 

@@ -114,7 +114,9 @@ public enum SingletonFactory {
         while (iterator.hasNext()) {
             SingletonInfo singletonInfo = mfSingletonInfoHashMap.get(iterator.next());
             if (singletonInfo.singleton != null) {
-                Log.e("SingletonFactory", "SingletonFactory has leak memory: ");
+                for (Object object : singletonInfo.callingObjects) {
+                    Log.e("SingletonFactory", "SingletonFactory has leak memory: " + object.getClass().getSimpleName());
+                }
             }
         }
     }
