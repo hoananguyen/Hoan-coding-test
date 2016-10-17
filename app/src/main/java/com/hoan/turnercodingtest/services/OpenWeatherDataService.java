@@ -29,6 +29,8 @@ public class OpenWeatherDataService implements DataService, Singleton {
         String url = "http://api.openweathermap.org/data/2.5/weather?q=" + location
                 + "&mode=json&units=imperial&appid=" + Configuration.getWeatherKey();
 
+        Logger.e("OpenWeatherDataService", "getWeather url = " + url);
+
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
@@ -52,6 +54,7 @@ public class OpenWeatherDataService implements DataService, Singleton {
     public void getForecast(String location, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
         String url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + location
                 + "&mode=json&units=imperial&cnt=7&appid=" + Configuration.getWeatherKey();
+        Logger.e("OpenWeatherDataService", "getForecast url = " + url);
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {

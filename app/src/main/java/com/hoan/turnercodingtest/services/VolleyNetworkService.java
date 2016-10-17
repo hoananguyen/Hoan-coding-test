@@ -27,7 +27,7 @@ public class VolleyNetworkService implements NetworkService, Singleton {
 
     @Override
     public void cancel(String tag) {
-        Logger.d(getClass().getSimpleName(), "cancel(" + tag + ")");
+        Logger.e("VolleyNetworkService", "cancel(" + tag + ")");
         mfRequestQueue.cancelAll(tag);
     }
 
@@ -44,7 +44,7 @@ public class VolleyNetworkService implements NetworkService, Singleton {
 
     @Override
     public void shutdown(SingletonFactory.SingletonParam singletonParam) {
-        Logger.d(getClass().getSimpleName(), "shutdown");
+        Logger.e("VolleyNetworkService", "shutdown");
         if (mfRequestQueue != null) {
             cancelAll();
         }
@@ -52,14 +52,14 @@ public class VolleyNetworkService implements NetworkService, Singleton {
 
     @Override
     public void getString(String url, String tag, FutureTaskListener<String> listener) {
-        Logger.d(getClass().getSimpleName(), "getString(" + url + ")");
+        Logger.e("VolleyNetworkService", "getString(" + url + ")");
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new VolleyResponseListener<>(listener), new VolleyErrorListener<>(listener));
         startRequest(stringRequest, tag);
     }
 
     private void startRequest(Request request, String tag) {
-        Logger.d(getClass().getSimpleName(), "startRequest");
+        Logger.e("VolleyNetworkService", "startRequest");
         request.setRetryPolicy(new DefaultRetryPolicy(VOLLEY_TIME_OUT, NUMBER_OF_RETRY, 0));
         request.setTag(tag);
         mfRequestQueue.add(request);
@@ -74,7 +74,7 @@ public class VolleyNetworkService implements NetworkService, Singleton {
 
         @Override
         public void onResponse(T response) {
-            Logger.d(getClass().getSimpleName(), "onResponse");
+            Logger.e("VolleyResponseListener", "onResponse");
             mListener.onCompletion(response);
         }
     }
@@ -88,7 +88,7 @@ public class VolleyNetworkService implements NetworkService, Singleton {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Logger.d(getClass().getSimpleName(), "onError");
+            Logger.e("VolleyResponseListener", "onError");
             mListener.onError(error.getMessage());
         }
     }

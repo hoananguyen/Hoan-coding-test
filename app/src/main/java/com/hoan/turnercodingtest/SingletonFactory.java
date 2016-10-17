@@ -7,6 +7,7 @@ import com.hoan.turnercodingtest.services.OpenWeatherDataService;
 import com.hoan.turnercodingtest.services.NetworkService;
 import com.hoan.turnercodingtest.services.Singleton;
 import com.hoan.turnercodingtest.services.VolleyNetworkService;
+import com.hoan.turnercodingtest.utils.Logger;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +78,7 @@ public enum SingletonFactory {
     }*/
 
     public Object getSingleton(String singletonClassName, Object object) {
+        Logger.e("SingletonFactory", "getSingleton(" + singletonClassName + ", " + object.getClass().getSimpleName());
         SingletonInfo singletonInfo = mfSingletonInfoHashMap.get(singletonClassName);
         if (singletonInfo == null) {
             singletonInfo = new SingletonInfo(createSingleton(singletonClassName), object);
@@ -88,7 +90,6 @@ public enum SingletonFactory {
                 } else {
                     singletonInfo.callingObjects.add(object);
                     if (singletonInfo.singleton == null) {
-                        singletonInfo.singleton.shutdown(mfSingletonParam);
                         singletonInfo.singleton = createSingleton(singletonClassName);
                     }
                 }
@@ -98,12 +99,14 @@ public enum SingletonFactory {
     }
 
     public void releaseSingleton(String singletonClassName, Object object) {
+        Logger.e("SingletonFactory", "releaseSingleton(" + singletonClassName + ", " + object.getClass().getSimpleName());
         SingletonInfo singletonInfo = mfSingletonInfoHashMap.get(singletonClassName);
         if (singletonInfo == null) return;
 
         synchronized (singletonInfo.callingObjects) {
             singletonInfo.callingObjects.remove(object);
             if (singletonInfo.callingObjects.isEmpty()) {
+                //singletonInfo.singleton.shutdown(mfSingletonParam);
                 singletonInfo.singleton = null;
             }
         }
@@ -115,7 +118,8 @@ public enum SingletonFactory {
             SingletonInfo singletonInfo = mfSingletonInfoHashMap.get(iterator.next());
             if (singletonInfo.singleton != null) {
                 for (Object object : singletonInfo.callingObjects) {
-                    Log.e("SingletonFactory", "SingletonFactory has leak memory: " + object.getClass().getSimpleName());
+                    Logger.e("SingletonFactory", "SingletonFactory has leak memory: "
+                            + singletonInfo.singleton.getClass().getSimpleName() + " by " + object.getClass().getSimpleName());
                 }
             }
         }

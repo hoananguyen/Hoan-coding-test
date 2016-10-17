@@ -193,10 +193,10 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
 
             return null;
         }
-    }
 
-    private void releaseSingleton() {
-        SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+        private void releaseSingleton() {
+            SingletonFactory.INSTANCE.releaseSingleton(DataService.class.getName(), this);
+        }
     }
 
     private class ForecastTask extends AsyncTask<Void, Void, Void> {
@@ -275,7 +275,7 @@ public class MainActivity extends BaseActivityWithFragment implements WeatherFra
             while (mWeatherDownloadState == WEATHER_DOWNLOAD_STARTED) {
                 synchronized (mLockObject) {
                     try {
-                        mLockObject.wait(1000);
+                        mLockObject.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         return;
